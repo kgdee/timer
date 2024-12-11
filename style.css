@@ -1,0 +1,108 @@
+/*==================== GOOGLE FONTS ====================*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+/*==================== BOOTSTRAP ICONS ====================*/
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css");
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+  text-decoration: none;
+  line-height: 1;
+}
+
+a, button {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.hidden-cursor {
+  cursor: none !important;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #212121;
+}
+
+.container {
+  max-width: 1440px;
+  margin: auto;
+}
+
+.app {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  max-height: 1000px;
+}
+
+
+
+.timer-container {
+  max-width: 400px;
+  margin: 100px auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+  color: #424242;
+}
+
+.controls {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #999;
+}
+
+.controls > * {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.increment-button {
+  background-color: #1976d2;
+  color: white;
+}
+
+.start-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.reset-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.audio-input {
+  background-color: #673ab7;
+  color: white;
+}
+
+.timer-display {
+  font-size: 48px;
+  font-weight: bold;
+  margin: 20px 0;
+  color: #424242;
+}
+
+.timer-alert {
+  font-size: 28px;
+  font-weight: bold;
+  color: #f44336;
+}
