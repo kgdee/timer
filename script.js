@@ -2,10 +2,11 @@ const storagePrefix = 'timer_'
 
 // Cache DOM elements to avoid multiple DOM queries
 const timerDisplay = document.querySelector(".timer-display");
-const incrementButtons = document.querySelectorAll(".increment-button")
-const resetButton = document.querySelector(".reset-button");
-const startButton = document.querySelector(".start-button");
-const audioInput = document.querySelector(".audio-input")
+const incrementButtons = document.querySelectorAll(".controls .increment")
+const resetButton = document.querySelector(".controls .reset");
+const startButton = document.querySelector(".controls .start");
+const audioInput = document.querySelector(".controls .audio-input")
+const volumeButton = document.querySelector(".controls .volume")
 const timerAlert = document.querySelector(".timer-alert")
 
 let countdown = null;
@@ -20,16 +21,22 @@ incrementButtons.forEach(button => {
 });
 startButton.addEventListener("click", startTimer);
 resetButton.addEventListener("click", resetTimer);
-audioInput.addEventListener("change", function(event) {
+audioInput.addEventListener("change", async function(event) {
   const audioFile = event.target.files[0]
   if (!audioFile) return
 
-  storeAudio(audioFile)
-})
-
-document.addEventListener("DOMContentLoaded", function() {
-  updateDisplay(0);
+  await storeAudio(audioFile)
   loadAudio()
+})
+volumeButton.addEventListener("click", changeVolume)
+
+
+document.addEventListener("DOMContentLoaded", async function() {
+  updateDisplay(0);
+  
+  await initDB();
+  await loadAudio()
+  updateVolumeButton();
 })
 
 
@@ -80,47 +87,131 @@ function updateDisplay(seconds) {
 }
 
 
+async function loadAudio() {
+  const fileBlob = await loadFile()
+
+  const url = fileBlob ? URL.createObjectURL(fileBlob) : "ringtone.mp3"
+
+  currentAudio = new Audio(url)
+  currentAudio.volume = 0.5
+  currentAudio.loop = true
+
+  currentAudio.addEventListener('volumechange', updateVolumeButton);
+}
+
+async function storeAudio(file) {
+  await saveFile(file)
+}
+
+function changeVolume() {
+  let volume = currentAudio.volume
+
+  volume += 0.25
+  if (volume > 1) volume = 0.25
+  
+  currentAudio.volume = volume
+}
+
+function updateVolumeButton() {
+  volumeButton.innerHTML = `${Math.round(currentAudio.volume * 100)}%`;
+}
+
+
 
 // File handling
-async function storeAudio(file) {
-  
-  const base64 = await fileToBase64(file);
-  localStorage.setItem(storagePrefix + 'audioFile', base64);
-  console.log("Audio file stored: " + file.name)
-  loadAudio()
-}
+// Initialize IndexedDB
+const dbName = 'fileStorageDB';
+const storeName = 'files';
+let db;
 
-function loadAudio() {
-  const base64 = localStorage.getItem(storagePrefix + 'audioFile');
-  if (base64) {
-    const audioBlob = base64ToBlob(base64);
-    const audioUrl = URL.createObjectURL(audioBlob);
-    currentAudio = new Audio(audioUrl)
-  } else {
-    currentAudio = new Audio("ringtone.mp3")
-  }
 
-  currentAudio.loop = true
-}
-
-// Convert file to Base64
-function fileToBase64(file) {
+function initDB() {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-    reader.readAsDataURL(file);
+    const request = indexedDB.open(dbName, 1);
+
+    request.onupgradeneeded = (event) => {
+      db = event.target.result;
+      if (!db.objectStoreNames.contains(storeName)) {
+        db.createObjectStore(storeName, { keyPath: 'id' });
+      }
+    };
+
+    request.onsuccess = (event) => {
+      db = event.target.result;
+      resolve(db);
+    };
+
+    request.onerror = (event) => {
+      console.error('Error initializing database:', event.target.error);
+      reject(event.target.error);
+    };
   });
 }
 
-// Convert Base64 back to a Blob
-function base64ToBlob(base64) {
-  const [metadata, data] = base64.split(',');
-  const mime = metadata.match(/:(.*?);/)[1];
-  const binary = atob(data);
-  const array = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    array[i] = binary.charCodeAt(i);
-  }
-  return new Blob([array], { type: mime });
+// Save File to IndexedDB
+function saveFile(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) {
+      reject(new Error('No file provided.'));
+      return;
+    }
+
+    const transaction = db.transaction([storeName], 'readwrite');
+    const store = transaction.objectStore(storeName);
+
+    const fileRecord = {
+      id: 'userFile',
+      file: file
+    };
+
+    const request = store.put(fileRecord);
+
+    request.onsuccess = () => {
+      console.log('File saved successfully.');
+      resolve('File saved successfully.');
+    };
+
+    request.onerror = (event) => {
+      console.error('Error saving file:', event.target.error);
+      reject(new Error('Error saving file: ' + event.target.error));
+    };
+  });
 }
+
+// Load File from IndexedDB
+function loadFile() {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([storeName], 'readonly');
+    const store = transaction.objectStore(storeName);
+
+    const request = store.get('userFile');
+
+    request.onsuccess = (event) => {
+      const record = event.target.result;
+
+      if (record) {
+        const fileBlob = record.file;
+
+        resolve(fileBlob)
+      } else {
+        console.log('No file found in the database.');
+        resolve(null)
+      }
+    };
+
+    request.onerror = (event) => {
+      console.error('Error loading file:', event.target.error);
+      reject(event.target.error)
+    };
+  })
+}
+
+
+
+
+// Error handling
+window.addEventListener("error", (event) => {
+  const error = `${event.type}: ${event.message}`
+  console.error(error)
+  alert(error)
+})

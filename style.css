@@ -79,23 +79,28 @@ h1 {
   cursor: pointer;
 }
 
-.increment-button {
+.controls .increment {
   background-color: #1976d2;
   color: white;
 }
 
-.start-button {
+.controls .start {
   background-color: #4caf50;
   color: white;
 }
 
-.reset-button {
+.controls .reset {
   background-color: #f44336;
   color: white;
 }
 
-.audio-input {
-  background-color: #673ab7;
+.controls .audio-input {
+  background-color: #757575;
+  color: white;
+}
+
+.controls .volume {
+  background-color: #757575;
   color: white;
 }
 
