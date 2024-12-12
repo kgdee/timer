@@ -20,7 +20,7 @@ incrementButtons.forEach(button => {
 });
 startButton.addEventListener("click", startTimer);
 resetButton.addEventListener("click", resetTimer);
-audioInput.addEventListener("change", async function(event) {
+audioInput.addEventListener("change", function(event) {
   const audioFile = event.target.files[0]
   if (!audioFile) return
 
@@ -45,8 +45,6 @@ function startTimer() {
 }
 
 function resetTimer() {
-  if (totalSeconds <= 0 && !countdown) return
-
   currentAudio.pause()
   clearInterval(countdown);
   countdown = null;
@@ -89,6 +87,7 @@ async function storeAudio(file) {
   const base64 = await fileToBase64(file);
   localStorage.setItem(storagePrefix + 'audioFile', base64);
   console.log("Audio file stored: " + file.name)
+  loadAudio()
 }
 
 function loadAudio() {
