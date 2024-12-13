@@ -12,6 +12,7 @@ const timerAlert = document.querySelector(".timer-alert")
 let countdown = null;
 let totalSeconds = 0;
 let currentAudio = null;
+let currentVolume = parseFloat(localStorage.getItem(storagePrefix + "currentVolume")) || 0.5
 
 // Add event listeners
 incrementButtons.forEach(button => {
@@ -61,11 +62,11 @@ function resetTimer() {
 }
 
 function startCountdown(seconds) {
-  let secondsLeft = seconds
+  const endTime = Date.now() + seconds * 1000;
 
   countdown = setInterval(() => {
 
-    secondsLeft--
+    const secondsLeft = Math.round((endTime - Date.now()) / 1000);
 
     if (secondsLeft <= 0) {
       clearInterval(countdown);
@@ -81,9 +82,15 @@ function startCountdown(seconds) {
 }
 
 function updateDisplay(seconds) {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  timerDisplay.textContent = `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+  // Calculate hours, minutes, and remaining seconds
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  // Format each part to ensure two digits
+  const format = (num) => String(num).padStart(2, '0');
+
+  timerDisplay.textContent = `${hours ? format(hours) + ":" : ""}${format(minutes)}:${format(secs)}`;
 }
 
 
@@ -93,7 +100,7 @@ async function loadAudio() {
   const url = fileBlob ? URL.createObjectURL(fileBlob) : "ringtone.mp3"
 
   currentAudio = new Audio(url)
-  currentAudio.volume = 0.5
+  currentAudio.volume = currentVolume
   currentAudio.loop = true
 
   currentAudio.addEventListener('volumechange', updateVolumeButton);
@@ -109,11 +116,14 @@ function changeVolume() {
   volume += 0.25
   if (volume > 1) volume = 0.25
   
-  currentAudio.volume = volume
+  currentVolume = volume
+  currentAudio.volume = currentVolume
+
+  localStorage.setItem(storagePrefix + "currentVolume", currentVolume)
 }
 
 function updateVolumeButton() {
-  volumeButton.innerHTML = `${Math.round(currentAudio.volume * 100)}%`;
+  volumeButton.innerHTML = `${Math.round(currentVolume * 100)}%`;
 }
 
 
