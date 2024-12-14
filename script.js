@@ -5,7 +5,7 @@ const timerDisplay = document.querySelector(".timer-display");
 const incrementButtons = document.querySelectorAll(".controls .increment")
 const resetButton = document.querySelector(".controls .reset");
 const startButton = document.querySelector(".controls .start");
-const audioInput = document.querySelector(".ringtone-modal .audio-input")
+const changeRingtoneBtn = document.querySelector(".ringtone-modal .audio-input")
 const ringtoneButton = document.querySelector(".controls .ringtone")
 const timerAlert = document.querySelector(".timer-alert")
 const ringtoneModal = document.querySelector('.ringtone-modal');
@@ -16,6 +16,9 @@ let countdown = null;
 let totalSeconds = 0;
 let currentAudio = null;
 let currentVolume = parseFloat(localStorage.getItem(storagePrefix + "currentVolume")) || 0.5
+let timerIsDone = false
+
+let isReady = false;
 
 // Add event listeners
 incrementButtons.forEach(button => {
@@ -26,55 +29,55 @@ incrementButtons.forEach(button => {
 startButton.addEventListener("click", startTimer);
 resetButton.addEventListener("click", resetTimer);
 ringtoneButton.addEventListener("click", toggleRingtoneModal)
-audioInput.addEventListener("change", async function(event) {
-  const audioFile = event.target.files[0]
-  if (!audioFile) return
-
-  await saveRingtone(audioFile)
-  await loadRingtone()
-})
+changeRingtoneBtn.addEventListener("change", (event)=>changeRingtone(event.target.files[0]))
 volumeButton.addEventListener("click", changeVolume)
 resetRingtoneBtn.addEventListener("click", resetRingtone)
 
 
 document.addEventListener("DOMContentLoaded", async function() {
-  updateDisplay(0);
+  updateDisplay();
   
   await initDB();
   await loadRingtone()
   updateVolumeButton();
+
+  isReady = true
 })
 
 
 function incrementTime(amount) {
+  if (!isReady || countdown) return
+  if (timerIsDone) resetTimer()
+
   totalSeconds += amount
-  updateDisplay(totalSeconds);
-}
-
-function startTimer() {
-  if (totalSeconds <= 0 || countdown) return
-
-  startCountdown(totalSeconds)
+  updateDisplay();
 }
 
 function resetTimer() {
+  if (!isReady) return
+
+  timerIsDone = false
   currentAudio.pause()
+  currentAudio.currentTime = 0;
   clearInterval(countdown);
   countdown = null;
   totalSeconds = 0;
-  updateDisplay(0);
+  updateDisplay();
   timerAlert.classList.add("hidden")
   timerDisplay.classList.remove("alert")
 }
 
-function startCountdown(seconds) {
-  const endTime = Date.now() + 5 * 1000;
+function startTimer() {
+  if (!isReady || totalSeconds <= 0 || countdown) return
+
+  const endTime = Date.now() + totalSeconds * 1000;
 
   countdown = setInterval(() => {
 
     const secondsLeft = Math.round((endTime - Date.now()) / 1000);
 
     if (secondsLeft <= 0) {
+      timerIsDone = true
       clearInterval(countdown);
       countdown = null;
 
@@ -84,17 +87,17 @@ function startCountdown(seconds) {
     }
 
     totalSeconds = secondsLeft
-    updateDisplay(secondsLeft);
+    updateDisplay();
   }, 1000);
 }
 
-function updateDisplay(seconds) {
-  if (seconds < 0) seconds = 0
+function updateDisplay() {
+  if (totalSeconds < 0) totalSeconds = 0
 
   // Calculate hours, minutes, and remaining seconds
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
 
   // Format each part to ensure two digits
   const format = (num) => String(num).padStart(2, '0');
@@ -103,6 +106,8 @@ function updateDisplay(seconds) {
 }
 
 function changeVolume(value) {
+  if (!isReady) return
+
   let volume = 0
 
   if (isFinite(value)) {
@@ -125,22 +130,41 @@ function updateVolumeButton() {
 
 
 function toggleRingtoneModal() {
+  if (!isReady) return
+
   ringtoneModal.classList.toggle('hidden');
 }
 
 
+async function changeRingtone(file) {
+  if (!isReady || !file) return
+
+  await saveRingtone(file)
+  await loadRingtone()
+}
 
 async function loadRingtone() {
   const fileBlob = await loadFile()
 
   const url = fileBlob ? URL.createObjectURL(fileBlob) : "ringtone.mp3"
 
+  const oldAudioIsPlaying = currentAudio ? !currentAudio.paused : false
+
+  if (oldAudioIsPlaying) {
+    currentAudio.pause()
+    currentAudio.currentTime = 0
+  }
+
   currentAudio = new Audio(url)
   currentAudio.volume = currentVolume
   currentAudio.loop = true
 
+  if (oldAudioIsPlaying) {
+    currentAudio.play()
+  }
+
   currentAudio.addEventListener('volumechange', updateVolumeButton);
-  audioInput.querySelector(".text").textContent = fileBlob?.name || "Default"
+  changeRingtoneBtn.querySelector(".text").textContent = fileBlob?.name || "Default"
 }
 
 async function saveRingtone(file) {
@@ -148,6 +172,8 @@ async function saveRingtone(file) {
 }
 
 async function resetRingtone() {
+  if (!isReady) return
+
   await deleteFile()
   await loadRingtone()
   changeVolume(0.5)
