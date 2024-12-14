@@ -5,9 +5,11 @@ const timerDisplay = document.querySelector(".timer-display");
 const incrementButtons = document.querySelectorAll(".controls .increment")
 const resetButton = document.querySelector(".controls .reset");
 const startButton = document.querySelector(".controls .start");
-const audioInput = document.querySelector(".controls .audio-input")
-const volumeButton = document.querySelector(".controls .volume")
+const audioInput = document.querySelector(".ringtone-modal .audio-input")
+const ringtoneButton = document.querySelector(".controls .ringtone")
 const timerAlert = document.querySelector(".timer-alert")
+const ringtoneModal = document.querySelector('.ringtone-modal');
+const volumeButton = document.querySelector(".ringtone-modal .volume")
 
 let countdown = null;
 let totalSeconds = 0;
@@ -22,12 +24,13 @@ incrementButtons.forEach(button => {
 });
 startButton.addEventListener("click", startTimer);
 resetButton.addEventListener("click", resetTimer);
+ringtoneButton.addEventListener("click", toggleRingtoneModal)
 audioInput.addEventListener("change", async function(event) {
   const audioFile = event.target.files[0]
   if (!audioFile) return
 
   await storeAudio(audioFile)
-  loadAudio()
+  await loadAudio()
 })
 volumeButton.addEventListener("click", changeVolume)
 
@@ -82,6 +85,8 @@ function startCountdown(seconds) {
 }
 
 function updateDisplay(seconds) {
+  if (seconds < 0) seconds = 0
+
   // Calculate hours, minutes, and remaining seconds
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -104,6 +109,7 @@ async function loadAudio() {
   currentAudio.loop = true
 
   currentAudio.addEventListener('volumechange', updateVolumeButton);
+  audioInput.textContent = fileBlob.name
 }
 
 async function storeAudio(file) {
@@ -125,6 +131,14 @@ function changeVolume() {
 function updateVolumeButton() {
   volumeButton.innerHTML = `${Math.round(currentVolume * 100)}%`;
 }
+
+
+function toggleRingtoneModal() {
+  ringtoneModal.classList.toggle('hidden');
+}
+
+
+
 
 
 

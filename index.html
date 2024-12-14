@@ -19,15 +19,30 @@
         <button class="increment" data-seconds="600">+10</button>
         <button class="start">Start</button>
         <button class="reset">Reset</button>
-        <label class="audio-input">
-          Ringtone
-          <input type="file" accept="audio/*" class="hidden">
-        </label>
-        <button class="volume">50%</button>
+        <button class="ringtone">Ringtone</button>
       </div>
       <div class="timer-display">00:00</div>
       <div class="timer-alert hidden">Time's up!</div>
     </div>
+    
+    
+    <!-- Modal overlay -->
+    <div class="ringtone-modal">
+      <div class="modal-content">
+        <h2>Ringtone</h2>
+        <button class="close-button" onclick="toggleRingtoneModal()">&times;</button>
+        <div class="settings">
+          <label class="audio-input">
+            Default
+            <input type="file" accept="audio/*" class="hidden">
+          </label>
+          <button class="volume">50%</button>
+          <button class="reset">Reset</button>
+        </div>
+      </div>
+    </div>
+
+
   </div>
 </body>
 </html>

@@ -13,6 +13,7 @@
   border: none;
   text-decoration: none;
   line-height: 1;
+  color: #424242;
 }
 
 a, button {
@@ -40,7 +41,7 @@ body {
 .app {
   overflow: hidden;
   position: relative;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -56,10 +57,6 @@ body {
   padding: 10px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-h1 {
-  color: #424242;
 }
 
 .controls {
@@ -94,12 +91,7 @@ h1 {
   color: white;
 }
 
-.controls .audio-input {
-  background-color: #757575;
-  color: white;
-}
-
-.controls .volume {
+.controls .ringtone {
   background-color: #757575;
   color: white;
 }
@@ -115,4 +107,74 @@ h1 {
   font-size: 28px;
   font-weight: bold;
   color: #f44336;
+}
+
+
+
+.ringtone-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal content */
+.ringtone-modal .modal-content {
+  position: relative;
+  width: 100%;
+  background: #fff;
+  border-radius: 8px;
+  max-width: 400px;
+  min-height: 200px;
+  padding: 10px;
+  padding-top: 20px;
+  margin: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.ringtone-modal .close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #000;
+}
+
+.ringtone-modal h2 {
+  margin-bottom: 10px;
+}
+
+.ringtone-modal .settings {
+  display: flex;
+  gap: 5px;
+}
+
+.ringtone-modal .settings > * {
+  background-color: #1976d2;
+  color: white;
+  display: inline-block;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.ringtone-modal .audio-input {
+  max-width: 100px;
+  white-space: nowrap; /* Prevents the text from wrapping */
+  overflow: hidden; /* Hides the overflowed text */
+  text-overflow: ellipsis; /* Adds the ellipsis */
+}
+
+.ringtone-modal .reset {
+  background-color: #f44336;
 }
