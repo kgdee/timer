@@ -10,6 +10,7 @@ const ringtoneButton = document.querySelector(".controls .ringtone")
 const timerAlert = document.querySelector(".timer-alert")
 const ringtoneModal = document.querySelector('.ringtone-modal');
 const volumeButton = document.querySelector(".ringtone-modal .volume")
+const resetRingtoneBtn = document.querySelector(".ringtone-modal .reset")
 
 let countdown = null;
 let totalSeconds = 0;
@@ -29,17 +30,18 @@ audioInput.addEventListener("change", async function(event) {
   const audioFile = event.target.files[0]
   if (!audioFile) return
 
-  await storeAudio(audioFile)
-  await loadAudio()
+  await saveRingtone(audioFile)
+  await loadRingtone()
 })
 volumeButton.addEventListener("click", changeVolume)
+resetRingtoneBtn.addEventListener("click", resetRingtone)
 
 
 document.addEventListener("DOMContentLoaded", async function() {
   updateDisplay(0);
   
   await initDB();
-  await loadAudio()
+  await loadRingtone()
   updateVolumeButton();
 })
 
@@ -62,10 +64,11 @@ function resetTimer() {
   totalSeconds = 0;
   updateDisplay(0);
   timerAlert.classList.add("hidden")
+  timerDisplay.classList.remove("alert")
 }
 
 function startCountdown(seconds) {
-  const endTime = Date.now() + seconds * 1000;
+  const endTime = Date.now() + 5 * 1000;
 
   countdown = setInterval(() => {
 
@@ -77,6 +80,7 @@ function startCountdown(seconds) {
 
       currentAudio.play()
       timerAlert.classList.remove("hidden")
+      timerDisplay.classList.add("alert")
     }
 
     totalSeconds = secondsLeft
@@ -98,29 +102,16 @@ function updateDisplay(seconds) {
   timerDisplay.textContent = `${hours ? format(hours) + ":" : ""}${format(minutes)}:${format(secs)}`;
 }
 
+function changeVolume(value) {
+  let volume = 0
 
-async function loadAudio() {
-  const fileBlob = await loadFile()
-
-  const url = fileBlob ? URL.createObjectURL(fileBlob) : "ringtone.mp3"
-
-  currentAudio = new Audio(url)
-  currentAudio.volume = currentVolume
-  currentAudio.loop = true
-
-  currentAudio.addEventListener('volumechange', updateVolumeButton);
-  audioInput.textContent = fileBlob.name
-}
-
-async function storeAudio(file) {
-  await saveFile(file)
-}
-
-function changeVolume() {
-  let volume = currentAudio.volume
-
-  volume += 0.25
-  if (volume > 1) volume = 0.25
+  if (isFinite(value)) {
+    volume = value
+  } else {
+    volume = currentAudio.volume
+    volume += 0.25
+    if (volume > 1) volume = 0.25
+  }
   
   currentVolume = volume
   currentAudio.volume = currentVolume
@@ -137,6 +128,30 @@ function toggleRingtoneModal() {
   ringtoneModal.classList.toggle('hidden');
 }
 
+
+
+async function loadRingtone() {
+  const fileBlob = await loadFile()
+
+  const url = fileBlob ? URL.createObjectURL(fileBlob) : "ringtone.mp3"
+
+  currentAudio = new Audio(url)
+  currentAudio.volume = currentVolume
+  currentAudio.loop = true
+
+  currentAudio.addEventListener('volumechange', updateVolumeButton);
+  audioInput.querySelector(".text").textContent = fileBlob?.name || "Default"
+}
+
+async function saveRingtone(file) {
+  await saveFile(file)
+}
+
+async function resetRingtone() {
+  await deleteFile()
+  await loadRingtone()
+  changeVolume(0.5)
+}
 
 
 
@@ -229,6 +244,29 @@ function loadFile() {
     };
   })
 }
+
+// Delete File from IndexedDB
+function deleteFile() {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([storeName], 'readwrite');
+    const store = transaction.objectStore(storeName);
+
+    const request = store.delete('userFile');
+
+    request.onsuccess = () => {
+      console.log('File deleted successfully.');
+      resolve('File deleted successfully.');
+    };
+
+    request.onerror = (event) => {
+      console.error('Error deleting file:', event.target.error);
+      reject(new Error('Error deleting file: ' + event.target.error));
+    };
+  });
+}
+
+
+
 
 
 

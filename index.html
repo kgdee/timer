@@ -27,13 +27,13 @@
     
     
     <!-- Modal overlay -->
-    <div class="ringtone-modal">
-      <div class="modal-content">
+    <div class="ringtone-modal hidden" onclick="toggleRingtoneModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
         <h2>Ringtone</h2>
         <button class="close-button" onclick="toggleRingtoneModal()">&times;</button>
         <div class="settings">
           <label class="audio-input">
-            Default
+            <div class="text">Default</div>
             <input type="file" accept="audio/*" class="hidden">
           </label>
           <button class="volume">50%</button>
