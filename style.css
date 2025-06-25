@@ -1,8 +1,25 @@
 /*==================== GOOGLE FONTS ====================*/
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 /*==================== BOOTSTRAP ICONS ====================*/
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css");
 
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333;
+  --border-color: rgba(0, 0, 0, 0.5);
+  --label-color: #eee;
+  --red: #f44336;
+  --green: #4caf50;
+  --blue: #3f51b5;
+  --lightblue: #2196f3;
+}
+
+.dark-theme {
+  --bg-color: #222;
+  --text-color: #eee;
+  --border-color: rgba(255, 255, 255, 0.5);
+  --label-color: #333;
+}
 
 * {
   box-sizing: border-box;
@@ -13,50 +30,105 @@
   border: none;
   text-decoration: none;
   line-height: 1;
-  color: #424242;
 }
 
-a, button {
+button {
   cursor: pointer;
+}
+
+.button {
+  display: inline-block;
+  padding: 8px 16px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 1rem;
+}
+
+.truncated {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hidden {
   display: none !important;
 }
 
-.hidden-cursor {
-  cursor: none !important;
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.modal .modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  max-width: calc(100% - 20px);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+}
+
+.modal .close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 0;
+  background-color: transparent;
+  color: var(--text-color);
+}
+
+.modal .actions {
+  display: flex;
+  gap: 5px;
+}
+
+.modal .actions > * {
+  flex: 1;
+}
+
+.modal .delete {
+  background-color: var(--red);
+}
+
+.modal .input-group {
+  display: flex;
+  gap: 10px;
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
-  background-color: #212121;
+  font-family: "Poppins", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 .container {
-  max-width: 1440px;
+  max-width: 480px;
   margin: auto;
 }
 
 .app {
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   position: relative;
   width: 100%;
   height: 100vh;
-  display: flex;
-  justify-content: center;
-}
-
-
-
-.timer-container {
-  max-width: 400px;
-  max-height: fit-content;
-  margin: 100px 5px;
-  background: #fff;
   padding: 10px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding-top: 20vh;
 }
 
 .controls {
@@ -65,95 +137,42 @@ body {
   gap: 5px;
   padding: 10px 0 20px 0;
   border-bottom: 1px solid #999;
+  margin-bottom: 20px;
 }
 
 .controls > * {
-  display: inline-block;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
+  min-width: 80px;
 }
 
 .controls .increment {
-  background-color: #1976d2;
-  color: white;
+  background-color: var(--lightblue);
 }
 
 .controls .start {
-  background-color: #4caf50;
-  color: white;
+  background-color: var(--green);
 }
 
 .controls .reset {
-  background-color: #f44336;
-  color: white;
+  background-color: var(--red);
 }
 
 .controls .ringtone {
-  background-color: #757575;
-  color: white;
+  background-color: var(--blue);
 }
 
-.timer-display {
+.time {
   font-size: 48px;
   font-weight: bold;
-  margin: 20px 0;
-  color: #424242;
 }
 
-.timer-display.alert {
+.time.alert {
   color: #f44336;
 }
 
-.timer-alert {
+.message {
   font-size: 28px;
   font-weight: bold;
   color: #f44336;
-}
-
-
-
-.ringtone-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Modal content */
-.ringtone-modal .modal-content {
-  position: relative;
-  width: 100%;
-  background: #fff;
-  border-radius: 8px;
-  max-width: 400px;
-  min-height: 200px;
-  padding: 10px;
-  padding-top: 20px;
-  margin: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.ringtone-modal .close-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #000;
-}
-
-.ringtone-modal h2 {
-  margin-bottom: 10px;
 }
 
 .ringtone-modal .settings {
@@ -162,39 +181,22 @@ body {
 }
 
 .ringtone-modal .settings > * {
-  background-color: #1976d2;
-  color: white;
-  display: inline-block;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.ringtone-modal .audio-input .text {
-  color: white;
-  max-width: 100px;
-  white-space: nowrap; /* Prevents the text from wrapping */
-  overflow: hidden; /* Hides the overflowed text */
-  text-overflow: ellipsis; /* Adds the ellipsis */
+  background-color: var(--lightblue);
 }
 
 .ringtone-modal .reset {
-  background-color: #f44336;
+  background-color: var(--red);
 }
 
+.ringtone-input {
+  max-width: 125px;
+}
 
-.loading-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-size: 1.5rem;
+.theme-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.75rem;
+  background-color: transparent;
+  color: var(--text-color);
 }

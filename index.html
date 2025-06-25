@@ -1,46 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Timer</title>
-  <link rel="icon" href="favicon.png" type="image/x-icon">
-  <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
-</head>
-<body>
-  <div class="app container">
-    <div class="timer-container">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timer</title>
+    <link rel="icon" href="favicon.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="scripts/constants.js" defer></script>
+    <script src="scripts/utils.js" defer></script>
+    <script src="scripts/db.js" defer></script>
+    <script src="scripts/main.js" defer></script>
+  </head>
+  <body>
+    <div class="app container">
       <h1>Timer</h1>
       <div class="controls">
-        <button class="increment" data-seconds="60">+1</button>
-        <button class="increment" data-seconds="300">+5</button>
-        <button class="increment" data-seconds="600">+10</button>
-        <button class="start">Start</button>
-        <button class="reset">Reset</button>
-        <button class="ringtone">Ringtone</button>
+        <button class="button increment" onclick="incrementTime(60)">+1</button>
+        <button class="button increment" onclick="incrementTime(300)">+5</button>
+        <button class="button increment" onclick="incrementTime(600)">+10</button>
+        <button class="button start" onclick="start()">
+          <i class="bi bi-play-fill"></i>
+        </button>
+        <button class="button reset" onclick="reset()">
+          <i class="bi bi-arrow-counterclockwise"></i>
+        </button>
+        <button class="button ringtone" onclick="toggleRingtoneModal()">Ringtone</button>
       </div>
-      <div class="timer-display">00:00</div>
-      <div class="timer-alert hidden">Time's up!</div>
-    </div>
-    
-    
-    <!-- Ringtone modal -->
-    <div class="ringtone-modal hidden" onclick="toggleRingtoneModal()">
-      <div class="modal-content" onclick="event.stopPropagation()">
-        <h2>Ringtone</h2>
-        <button class="close-button" onclick="toggleRingtoneModal()">&times;</button>
-        <div class="settings">
-          <label class="audio-input">
-            <div class="text">Default</div>
-            <input type="file" accept="audio/*" class="hidden">
-          </label>
-          <button class="volume">50%</button>
-          <button class="reset">Reset</button>
+      <div class="time">00:00</div>
+      <div class="message hidden">Time's up!</div>
+
+      <button class="theme-toggle" onclick="toggleTheme()"></button>
+
+      <div class="modal ringtone-modal hidden" onclick="toggleRingtoneModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+          <h2>Ringtone</h2>
+          <button class="close" onclick="toggleRingtoneModal()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+          <div class="settings">
+            <label class="button ringtone-input" onchange="changeRingtone(event.target.files[0])">
+              <div class="text truncated">Default</div>
+              <input type="file" accept="audio/*" class="hidden" />
+            </label>
+            <button class="button volume" onclick="changeVolume()">50%</button>
+            <button class="button reset" onclick="resetRingtone()">Reset</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>
